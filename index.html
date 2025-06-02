@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My 3D Website</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+    <h1>Hello world</h1>
+  <!-- Main container (optional if you're appending to body) -->
+  <div id="scene-container"></div>
+
+  <!-- Main JavaScript file (module for ES6 support) -->
+  <script type="module" src="main.js">
+    import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
+  </script>
+</body>
+</html>
