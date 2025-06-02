@@ -1,7 +1,7 @@
 // main.js
-import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.155.0/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.155.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'https://esm.sh/three@0.155.0';
+import { GLTFLoader } from 'https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls } from 'https://esm.sh/three@0.155.0/examples/jsm/controls/OrbitControls';
 console.log("Main.js loaded and running");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -51,6 +51,12 @@ const floor = new THREE.Mesh(
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.01;
 scene.add(floor);
+
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+const cube = new THREE.Mesh(geometry, material);
+cube.position.set(0, 1, 0);
+scene.add(cube);
 
 function animate() {
   requestAnimationFrame(animate);
