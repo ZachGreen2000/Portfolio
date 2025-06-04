@@ -27,6 +27,18 @@ document.body.appendChild(renderer.domElement);
 const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
 scene.add(light);
 
+// Load texture
+const textureLoader = new THREE.TextureLoader();
+const bgTexture = textureLoader.load('./images/sunset.png');
+
+const bgMaterial = new THREE.MeshBasicMaterial({ map: bgTexture });
+const bgGeometry = new THREE.PlaneGeometry(50, 30); // size it according to your scene
+const backgroundPlane = new THREE.Mesh(bgGeometry, bgMaterial);
+
+// Place it far back on Z axis
+backgroundPlane.position.set(0, 10, -20); 
+scene.add(backgroundPlane);
+
 // Load models
 const loader = new GLTFLoader();
 
