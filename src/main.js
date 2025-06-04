@@ -29,12 +29,6 @@ scene.add(light);
 
 // Load models
 const loader = new GLTFLoader();
-const modelPaths = [
-  './models/bookshelf1.glb',
-  './models/bookshelf2.glb',
-  './models/bookshelf3.glb',
-  './models/bookshelf4.glb'
-];
 
 // loading character model for use
 loader.load('./models/character2Animation.glb', (gltf) => {
@@ -82,25 +76,40 @@ window.addEventListener('keydown', (e) => {
 const spacing = 10; // spacing between bookshelves
 const distance = -1;
 
-modelPaths.forEach((path, index) => {
-  loader.load(
-    path,
-    (gltf) => {
-      const shelf = gltf.scene;
+// Bookshelf 1
+loader.load('./models/bookshelf1.glb', (gltf) => {
+  const shelf1 = gltf.scene;
+  shelf1.position.set(5, 0, -2);
+  shelf1.rotation.y = 99;  // Adjust rotation as needed
+  shelf1.scale.set(1.3, 1.3, 1.3); // Adjust scale if needed
+  scene.add(shelf1);
+});
 
-      // Fix orientation (commonly needed for GLTFs from Blender)
-      shelf.rotation.set(0, -190, 0); // Flip to face camera (if needed)
-      shelf.rotation.x = 0;              // Flatten if tilted
+// Bookshelf 2
+loader.load('./models/bookshelf2.glb', (gltf) => {
+  const shelf2 = gltf.scene;
+  shelf2.position.set(15, 0, -2.5);
+  shelf2.rotation.y = 99;
+  shelf2.scale.set(1.3, 1.3, 1.3);
+  scene.add(shelf2);
+});
 
-      shelf.position.set(index * spacing, 0, index * distance); // Lay shelves side by side
-      //shelf.rotation.y = Math.PI; // Rotate to face +Z (toward camera)
-      scene.add(shelf);
-    },
-    undefined,
-    (error) => {
-      console.error(`Failed to load ${path}:`, error);
-    }
-  );
+// Bookshelf 3
+loader.load('./models/bookshelf3.glb', (gltf) => {
+  const shelf3 = gltf.scene;
+  shelf3.position.set(25, 0, -3);
+  shelf3.rotation.y = 99;
+  shelf3.scale.set(1.3, 1.3, 1.3);
+  scene.add(shelf3);
+});
+
+// Bookshelf 4
+loader.load('./models/bookshelf4.glb', (gltf) => {
+  const shelf4 = gltf.scene;
+  shelf4.position.set(35, 0, -3.5);
+  shelf4.rotation.y = 99
+  shelf4.scale.set(1.3, 1.3, 1.3);
+  scene.add(shelf4);
 });
 
 // Floor
@@ -117,7 +126,7 @@ let rigX = 0;
 let targetRigX = 0;
 const moveStep = 0.5;
 const minX = -5;
-const maxX = spacing * (modelPaths.length - 1) + 5;
+const maxX = 20;
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === 'd') {
