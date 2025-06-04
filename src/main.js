@@ -27,7 +27,7 @@ document.body.appendChild(renderer.domElement);
 const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
 scene.add(light);
 
-// Load texture
+// Load texture for skybox
 const textureLoader = new THREE.TextureLoader();
 const bgTexture = textureLoader.load('./images/sunset.png');
 
@@ -41,6 +41,35 @@ scene.add(backgroundPlane);
 
 // Load models
 const loader = new GLTFLoader();
+
+//load walls for background
+const wallTypes = [
+  './models/wallTile.glb',
+  './models/wallWindowTile.glb'
+];
+
+const loadedWalls = [];
+const tileCount = 10;
+
+// function to build walls
+function tryBuildWall() {
+  if (loadedWalls.length === wallTypes.length) {
+    for (let i = 0; i < tileCount; i++) {
+      const wall = loadedWalls[i % wallTypes.length].clone();
+      wall.position.set(i * 3.5, 0, -5);
+      wall.rotation.y = 99;
+      wall.scale.set(2, 2, 2);
+      scene.add(wall);
+    }
+  }
+}
+// loop through wall index
+wallTypes.forEach((path, idx) => {
+  loader.load(path, (gltf) => {
+    loadedWalls[idx] = gltf.scene;
+    tryBuildWall();
+  });
+});
 
 // loading character model for use
 loader.load('./models/character2Animation.glb', (gltf) => {
