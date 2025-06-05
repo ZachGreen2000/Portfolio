@@ -43,33 +43,96 @@ scene.add(backgroundPlane);
 const loader = new GLTFLoader();
 
 //load walls for background
-const wallTypes = [
-  './models/wallTile.glb',
-  './models/wallWindowTile.glb'
-];
+const wallPaths = {
+  normal: './models/wallTile.glb',
+  window: './models/wallWindowTile.glb'
+};
 
-const loadedWalls = [];
+const loadedWalls = { normal: null, window: null };
 const tileCount = 10;
 
-// function to build walls
-function tryBuildWall() {
-  if (loadedWalls.length === wallTypes.length) {
-    for (let i = 0; i < tileCount; i++) {
-      const wall = loadedWalls[i % wallTypes.length].clone();
-      wall.position.set(i * 3.5, 0, -5);
-      wall.rotation.y = 99;
-      wall.scale.set(2, 2, 2);
-      scene.add(wall);
-    }
+function buildWalls() {
+  if (!loadedWalls.normal || !loadedWalls.window) return;
+
+  // Adjust this spacing and offsets as needed
+  const wallSpacing = 13.82;
+  const normalStartX = 0;
+  const windowStartX = 15.6; // Offset window walls by half a tile
+
+  // 🔹 Loop for normal wall tiles
+  for (let i = 0; i < tileCount; i++) {
+    const wall = loadedWalls.normal.clone();
+    wall.position.set(normalStartX + i * wallSpacing, 0, -3);
+    wall.rotation.y = THREE.MathUtils.degToRad(90);
+    wall.scale.set(2, 2.5, 2);
+    scene.add(wall);
+  }
+
+  // 🔹 Loop for window wall tiles
+  for (let i = 0; i < tileCount; i++) {
+    const windowWall = loadedWalls.window.clone();
+    windowWall.position.set(windowStartX + i * wallSpacing, 0, -3);
+    windowWall.rotation.y = THREE.MathUtils.degToRad(90);
+    windowWall.scale.set(2, 2.5, 2);
+    scene.add(windowWall);
   }
 }
-// loop through wall index
-wallTypes.forEach((path, idx) => {
-  loader.load(path, (gltf) => {
-    loadedWalls[idx] = gltf.scene;
-    tryBuildWall();
-  });
+
+// Load each model
+loader.load(wallPaths.normal, (gltf) => {
+  loadedWalls.normal = gltf.scene;
+  buildWalls();
 });
+
+loader.load(wallPaths.window, (gltf) => {
+  loadedWalls.window = gltf.scene;
+  buildWalls();
+});
+
+// load main book model
+let book, bookStartPos, bookFalling = false;
+const triggerDistance = 2;
+const bookGroup = new THREE.Group();
+
+loader.load('./models/book.glb', (gltf) => {
+  book = gltf.scene;
+  book.scale.set(0.5, 0.5, 0.5);
+  book.position.set(13, 1.3, 0.1); // adjust to fit bookshelf
+  bookStartPos = book.position.clone();
+  bookGroup.add(book);
+  scene.add(bookGroup);
+});
+
+// create UI prompt
+const prompt = document.createElement('div');
+prompt.style.position = 'absolute';
+prompt.style.bottom = '50px';
+prompt.style.left = '50%';
+prompt.style.transform = 'translateX(-50%)';
+prompt.style.padding = '10px 20px';
+prompt.style.borderRadius = '8px';
+prompt.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+prompt.style.color = 'white';
+prompt.style.fontSize = '16px';
+prompt.style.fontFamily = 'sans-serif';
+prompt.innerText = 'Press [E] to read the book';
+prompt.style.display = 'none';
+document.body.appendChild(prompt);
+
+// book animation
+function animateBookOut() {
+  new TWEEN.Tween(book.position)
+    .to({ x: book.position.x + 0.3, y: book.position.y - 0.5, z: book.position.z }, 1000)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .start();
+}
+
+function animateBookIn() {
+  new TWEEN.Tween(book.position)
+    .to({ x: bookStartPos.x, y: bookStartPos.y, z: bookStartPos.z }, 1000)
+    .easing(TWEEN.Easing.Quadratic.In)
+    .start();
+}
 
 // loading character model for use
 loader.load('./models/character2Animation.glb', (gltf) => {
@@ -185,6 +248,25 @@ function animate() {
   cameraRig.position.x = rigX;
   const delta = clock.getDelta();
   if (mixer) mixer.update(delta);
+
+  // Simple distance check for book animation
+  if (book && characterModel) {
+    const distance = characterModel.position.distanceTo(book.position);
+
+    if (distance < triggerDistance) {
+      if (!bookFalling) {
+        bookFalling = true;
+        animateBookOut();
+        prompt.style.display = 'block';
+      }
+    } else {
+      if (bookFalling) {
+        bookFalling = false;
+        animateBookIn();
+        prompt.style.display = 'none';
+      }
+    }
+  }
   renderer.render(scene, camera);
 }
 animate();
